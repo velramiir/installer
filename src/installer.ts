@@ -39,24 +39,26 @@ class Installer {
     await this.queryCoreConfig();
   }
 
-  private static validateServerAddress(input: string): boolean {
-    return !!input.match(
+  private static validateHostname(serverAddress: string): boolean | string {
+    const isValid = !!serverAddress.match(
       /^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$/
     );
+    return isValid ? isValid : "Please enter a valid hostname.";
   }
 
   private async queryCoreConfig() {
     const questions: QuestionCollection = [
       {
         type: "input",
-        name: "serverAddress",
-        message: "Please enter the server address dot.base will run on (e.g. demo.dotbase.org): ",
-        validate: Installer.validateServerAddress,
+        name: "hostname",
+        message: "Please enter the hostname dot.base will run on (e.g. demo.dotbase.org): ",
+        validate: Installer.validateHostname,
       },
       {
         type: "input",
         name: "test",
-        message: "Do you want to use extensions: ",
+        message:
+          "Do you want to use dot.base extensions\n to integrate it into your hospital? (Requires)",
       },
     ];
     const answers = await inquirer.prompt(questions);
