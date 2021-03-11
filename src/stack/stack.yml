@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+  {{> proxy }}
+
+  {{> keycloak }}
+
+  {{> error-handler }}
+
+  {{> medical-dashboard }}
+
+  {{> fhir-server }}
+
+  {{> file-storage }}
+
+  {{> icd-10-api }}
+
+  {{#if hdpAdapter}}
+  {{> hdp-adapter }}
+  {{/if}}
+
+  {{#if CommServerAdapter}}
+  {{> comm-server-adapter }}
+  {{/if}}
+
+  {{#if medtronicDbsApi}}
+  {{> medtronic-dbs-api }}
+  {{/if}}
+
+networks:
+  {{> networks }}
+
+volumes:
+  {{> volumes }}

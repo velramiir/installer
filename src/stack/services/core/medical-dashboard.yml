@@ -1,0 +1,17 @@
+medical-dashboard:
+  image: ghcr.io/dot-base/medical-dashboard:next
+  networks:
+    - proxy
+  deploy:
+    replicas: 1
+    update_config:
+      parallelism: 2
+      delay: 60s
+    restart_policy:
+      condition: on-failure
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.tls=true"
+      - "traefik.http.routers.frontend.middlewares=sso"
+      - "traefik.http.routers.frontend.rule=Host(`${HOSTNAME}`)"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"

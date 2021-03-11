@@ -1,0 +1,23 @@
+file-storage-api:
+  image: ghcr.io/dot-base/file-storage-api:next
+  environment:
+    DOMAIN: ${HOSTNAME}
+    SENTRY_DSN: ${FILE_STORAGE_API_SENTRY_DSN}
+    SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT}
+  networks:
+    - proxy
+  volumes:
+    - file-storage:/files
+  deploy:
+    replicas: 1
+    update_config:
+      parallelism: 2
+      delay: 60s
+    restart_policy:
+      condition: on-failure
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.file-storage-api.tls=true"
+      - "traefik.http.routers.file-storage-api.middlewares=sso"
+      - "traefik.http.routers.file-storage-api.rule=Host(`${HOSTNAME}`) && PathPrefix(`/api/files`)"
+      - "traefik.http.services.file-storage-api.loadbalancer.server.port=3000"

@@ -1,0 +1,67 @@
+traefik:
+  image: traefik:v2.2
+  networks:
+    - proxy
+  ports:
+    - "80:80"
+    - "443:443"
+  command:
+    - "--log.level=INFO"
+    - "--api.insecure=true"
+    - "--api.dashboard=true"
+    - "--providers.docker=true"
+    - "--providers.docker.swarmMode=true"
+    - "--providers.docker.exposedbydefault=false"
+    - "--entrypoints.web.address=:80"
+    - "--providers.file.watch=true"
+    - "--providers.file.directory=/configuration/"
+    - "--entrypoints.web-secure.address=:443"
+    - "--entrypoints.web.http.redirections.entryPoint.to=web-secure"
+    - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+    - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
+  volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+  deploy:
+    replicas: 1
+    update_config:
+      parallelism: 2
+      delay: 60s
+    restart_policy:
+      condition: on-failure
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api.middlewares=sso"
+      - "traefik.http.routers.api.rule=Host(`traefik.${HOSTNAME}`)"
+      - "traefik.http.services.api.loadbalancer.server.port=8080"
+      - "traefik.http.routers.api.service=api@internal"
+      - "traefik.http.routers.api.tls=true"
+
+traefik-forward-auth:
+  image: thomseddon/traefik-forward-auth:2
+  networks:
+    - proxy
+  volumes:
+    - ../config/ca-certificates/dfn-ca.crt:/etc/ssl/certs/dfn-ca.crt:ro
+    - ../config/ca-certificates/dfn-intermediate.crt:/etc/ssl/certs/dfn-intermediate.crt:ro
+    - ../config/ca-certificates/dfn-root.crt:/etc/ssl/certs/dfn-root.crt:ro
+  environment:
+    - DEFAULT_PROVIDER=oidc
+    - PROVIDERS_OIDC_ISSUER_URL=https://sso.${HOSTNAME}/auth/realms/dotbase
+    - PROVIDERS_OIDC_CLIENT_ID=central-proxy
+    - PROVIDERS_OIDC_CLIENT_SECRET=${AUTH_CLIENT_SECRET}
+    - LOGOUT_REDIRECT=https://${HOSTNAME}/
+    - SECRET=${SIGNING_SECRET}
+    - INSECURE_COOKIE=true
+    - LOG_LEVEL=debug
+  deploy:
+    replicas: 1
+    update_config:
+      parallelism: 2
+      delay: 60s
+    restart_policy:
+      condition: on-failure
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.sso.forwardauth.address=http://traefik-forward-auth:4181"
+      - "traefik.http.middlewares.sso.forwardauth.authResponseHeaders=X-Forwarded-User"
+      - "traefik.http.services.traefik-forward-auth.loadbalancer.server.port=4181"

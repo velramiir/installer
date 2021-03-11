@@ -1,0 +1,20 @@
+hdp-adapter:
+  image: ghcr.io/dot-base/hdp-adapter:next
+  environment:
+    SENTRY_DSN: ${HDP_ADAPTER_SENTRY_DSN}
+    SENTRY_ENVIRONMENT: ${SENTRY_ENVIRONMENT}
+  networks:
+    - proxy
+  deploy:
+    replicas: 1
+    update_config:
+      parallelism: 2
+      delay: 60s
+    restart_policy:
+      condition: on-failure
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.icd-10-api.tls=true"
+      - "traefik.http.routers.icd-10-api.middlewares=sso"
+      - "traefik.http.routers.icd-10-api.rule=Host(`${HOSTNAME}`) && PathPrefix(`/api/patient-import`)"
+      - "traefik.http.services.icd-10-api.loadbalancer.server.port=3000"
