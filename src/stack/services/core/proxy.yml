@@ -4,7 +4,6 @@ traefik:
     - proxy
   ports:
     - "80:80"
-    - "443:443"
   command:
     - "--log.level=INFO"
     - "--api.insecure=true"
@@ -13,12 +12,6 @@ traefik:
     - "--providers.docker.swarmMode=true"
     - "--providers.docker.exposedbydefault=false"
     - "--entrypoints.web.address=:80"
-    - "--providers.file.watch=true"
-    - "--providers.file.directory=/configuration/"
-    - "--entrypoints.web-secure.address=:443"
-    - "--entrypoints.web.http.redirections.entryPoint.to=web-secure"
-    - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
-    - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock
   deploy:
@@ -34,7 +27,6 @@ traefik:
       - "traefik.http.routers.api.rule=Host(`traefik.${HOSTNAME}`)"
       - "traefik.http.services.api.loadbalancer.server.port=8080"
       - "traefik.http.routers.api.service=api@internal"
-      - "traefik.http.routers.api.tls=true"
 
 traefik-forward-auth:
   image: thomseddon/traefik-forward-auth:2

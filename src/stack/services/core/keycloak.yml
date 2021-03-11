@@ -24,7 +24,6 @@ keycloak:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
-      - "traefik.http.routers.keycloak.tls=true"
       - "traefik.http.routers.keycloak.rule=Host(`sso.${HOSTNAME}`)"
       - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
 

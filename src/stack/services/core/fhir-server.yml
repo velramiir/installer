@@ -20,7 +20,6 @@ fhir-server:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
-      - "traefik.http.routers.fhir.tls=true"
       - "traefik.http.routers.fhir.middlewares=sso"
       - "traefik.http.routers.fhir.rule=Host(`${HOSTNAME}`) && PathPrefix(`/api/fhir`)"
       - "traefik.http.services.fhir.loadbalancer.server.port=8080"

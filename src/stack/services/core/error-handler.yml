@@ -12,7 +12,6 @@ error-handler:
     labels:
       - "traefik.enable=true"
 
-      - "traefik.http.routers.error-router.tls=true"
       - "traefik.http.routers.error-router.priority=1"
       - "traefik.http.routers.error-router.rule=HostRegexp(`{host:.+}`)"
       - "traefik.http.routers.error-router.middlewares=error-pages-middleware"

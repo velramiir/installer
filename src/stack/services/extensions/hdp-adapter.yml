@@ -14,7 +14,6 @@ hdp-adapter:
       condition: on-failure
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.icd-10-api.tls=true"
       - "traefik.http.routers.icd-10-api.middlewares=sso"
       - "traefik.http.routers.icd-10-api.rule=Host(`${HOSTNAME}`) && PathPrefix(`/api/patient-import`)"
       - "traefik.http.services.icd-10-api.loadbalancer.server.port=3000"
