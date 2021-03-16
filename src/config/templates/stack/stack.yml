@@ -1,20 +1,6 @@
 version: "3.8"
 
 services:
-  {{> proxy }}
-
-  {{> keycloak }}
-
-  {{> error-handler }}
-
-  {{> medical-dashboard }}
-
-  {{> fhir-server }}
-
-  {{> file-storage }}
-
-  {{> icd-10-api }}
-
   {{#if hdpAdapter}}
   {{> hdp-adapter }}
   {{/if}}
@@ -28,7 +14,5 @@ services:
   {{/if}}
 
 networks:
-  {{> networks }}
-
-volumes:
-  {{> volumes }}
+  proxy:
+    external: true
