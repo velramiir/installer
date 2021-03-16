@@ -249,68 +249,6 @@ class Installer {
     return inquirer.prompt(Installer.configQuestions);
   }
 
-  private static registerServices(type: string): void {
-    const serviceDirectory = `src/stack/services/${type}`
-    const serviceFileNames = fs.readdirSync(serviceDirectory);
-
-    for (const serviceFileName of serviceFileNames) {
-      const serviceTemplate = fs.readFileSync(`${serviceDirectory}/${serviceFileName}`).toString();
-      const partialName = serviceFileName.replace(".yml", "");
-      handlebars.registerPartial(partialName, serviceTemplate);
-    }
-  }
-
-  private static registerNetworks(): void {
-    const networksTemplate = fs.readFileSync('src/stack/networks.yml').toString();
-    handlebars.registerPartial('networks', networksTemplate);
-  }
-
-  private static registerVolumes(): void {
-    const volumesTemplate = fs.readFileSync('src/stack/volumes.yml').toString();
-    handlebars.registerPartial('volumes', volumesTemplate);
-  }
-
-  private static createDirectory(name: string) {
-    if (!fs.existsSync(name)) fs.mkdirSync(name);
-  }
-
-  private static createDockerStackFile(config: inquirer.Answers): void {
-    Installer.registerServices('core');
-    Installer.registerServices('extensions');
-    Installer.registerNetworks();
-    Installer.registerVolumes();
-    const stackTemplate = fs.readFileSync('src/stack/stack.yml').toString();
-    const stack = handlebars.compile(stackTemplate);
-    
-    const stackContext: any = {};
-    if (config.USE_EXTENSIONS) {
-      stackContext.hdpAdapter = config.EXTENSIONS_TO_USE.includes('hdpAdapter');
-      stackContext.commServerAdapter = config.EXTENSIONS_TO_USE.includes('commServerAdapter');
-      stackContext.medtronicDbsApi = config.EXTENSIONS_TO_USE.includes('medtronicDbsApi');
-    }
-    
-    this.createDirectory('deployment');
-    fs.writeFileSync('deployment/dotbase-stack.yml', stack(stackContext));
-  }
-
-  private static setEnvironmentVariables(config: inquirer.Answers) {
-    let stackConfig = "";
-    for (const key in config) {
-      if (['USE_EXTENSIONS', 'EXTENSIONS_TO_USE', 'GITHUB_ACCESS_TOKEN', 'USE_SENTRY', 'CREATE_INSTANCE'].includes(key)) return;
-      if (!Object.prototype.hasOwnProperty.call(config, key)) return;
-
-      const value = config[key];
-      stackConfig += `${key}=${value}\n`;
-    }
-    fs.writeFileSync('deployment/parameters.yml', stackConfig);
-  }
-
-  private static setEnvironmentVariable(name: string, value: string) {
-    cmd.runSync(`export ${name}="${value}"`);
-  }
-
-  // Starts here
-
   private static async initalize() {
     Installer.introduce();
 
@@ -323,7 +261,7 @@ class Installer {
     if (config.USE_HTTPS) {
       Installer.createDockerConfig('traefik.toml', 'src/config/traefik.toml');
       Installer.createDockerSecret('cert.pem', config.TLS_CERT_PATH);
-      Installer.createDockerConfig('key.pem', config.TLS_KEY_PATH);
+      Installer.createDockerSecret('key.pem', config.TLS_KEY_PATH);
     } else {
       Installer.createEmptyDockerConfig('traefik.toml');
       Installer.createEmptyDockerSecret('cert.pem');
@@ -350,9 +288,9 @@ class Installer {
 
     Installer.fillConfigTemplate('parameters.yml', config);
 
-    // Installer.launchDotBase();
+    Installer.enableExperimentalDockerFeatures();
+    Installer.launchDotBase();
   }
-
 
   private static fillConfigTemplate(filename: string, config: inquirer.Answers) {
     const configFileTemplate = fs.readFileSync(`src/config/templates/${filename}`).toString();
@@ -360,6 +298,10 @@ class Installer {
     
     this.createDirectory('deployment');
     fs.writeFileSync(`deployment/${filename}`, configFile(config));
+  }
+
+  private static createDirectory(name: string) {
+    if (!fs.existsSync(name)) fs.mkdirSync(name);
   }
 
   private static createDockerSecret(name: string, file: string) {
@@ -401,7 +343,7 @@ class Installer {
   }
 
   private static launchDotBase() {
-    const output = cmd.runSync(`docker app run --parameters-file deployment/parameters.yml dot-base:latest`);
+    const output = cmd.runSync(`docker app run --parameters-file deployment/parameters.yml ghcr.io/dot-base/dot-base:latest`);
     console.log(output);
   }
 
