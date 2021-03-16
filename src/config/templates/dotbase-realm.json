@@ -686,17 +686,15 @@
     {
       "id": "969f48df-0dba-43cc-9b22-665318342e9a",
       "clientId": "central-proxy",
-      "rootUrl": "https://${DOMAIN}",
-      "adminUrl": "https://${DOMAIN}",
+      "rootUrl": "https://{{HOSTNAME}}",
+      "adminUrl": "https://{{HOSTNAME}}",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
-      "secret": "${AUTH_CLIENT_SECRET}",
+      "secret": "{{AUTH_CLIENT_SECRET}}",
       "redirectUris": [
-        "https://traefik.${DOMAIN}/*",
-        "https://beta.${DOMAIN}/*",
-        "https://${DOMAIN}/*"
+        "https://{{HOSTNAME}}/*"
       ],
       "webOrigins": [],
       "notBefore": 0,
@@ -1550,10 +1548,10 @@
             "sAMAccountName"
           ],
           "bindDn": [
-            "${LDAP_SERVICE_USER_EMAIL}"
+            "{{LDAP_SERVICE_USER_EMAIL}}"
           ],
           "bindCredential": [
-            "${LDAP_SERVICE_USER_PASSWORD}"
+            "{{LDAP_SERVICE_USER_PASSWORD}}"
           ],
           "changedSyncPeriod": [
             "-1"
@@ -2271,7 +2269,7 @@
     "clientOfflineSessionMaxLifespan": "0",
     "clientSessionIdleTimeout": "0",
     "clientSessionMaxLifespan": "0",
-    "frontendUrl": "https://sso.${DOMAIN}/auth",
+    "frontendUrl": "https://sso.{{HOSTNAME}}/auth",
     "clientOfflineSessionIdleTimeout": "0"
   },
   "keycloakVersion": "11.0.0",
