@@ -19,7 +19,6 @@
     "generate-password": "^1.6.0",
     "handlebars": "^4.7.7",
     "inquirer": "^8.0.0",
-    "node-cmd": "^4.0.0",
     "tsconfig-paths": "^3.9.0",
     "tslib": "^2.0.0",
     "unique-names-generator": "^4.4.0"

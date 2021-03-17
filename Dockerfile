@@ -8,8 +8,9 @@ RUN npm install && \
     mv ./tsconfig.json ./builder/tsconfig.json && \
     mv ./package.json ./builder/package.json
 
-FROM node:14-alpine
+FROM docker:20-dind
 WORKDIR /usr/src/project
 COPY --from=builder /usr/src/node-builder/builder .
-RUN npm install --production
+RUN apk add --update npm && \
+    npm install --production
 CMD npm run production
