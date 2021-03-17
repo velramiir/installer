@@ -353,7 +353,7 @@ class Installer {
 
   private static async launchDotBase() {
     await Installer.exec(
-      `export DOCKER_CLI_EXPERIMENTAL=enabled && docker app run --parameters-file deployment/parameters.yml ghcr.io/dot-base/dot-base:latest`
+      `export DOCKER_CLI_EXPERIMENTAL=enabled && docker app run --parameters-file deployment/parameters.yml --name dot-base ghcr.io/dot-base/dot-base:latest`
     );
   }
 
