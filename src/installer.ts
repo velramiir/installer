@@ -42,7 +42,7 @@ class Installer {
     console.log();
     console.log("Welcome to the dot.base installer! This tool will walk you through");
     console.log("the installation and configuration of dot.base. Just follow the steps");
-    console.log("and we got you up and running in no time.");
+    console.log("and we will have you up and running in no time.");
     console.log();
   }
 

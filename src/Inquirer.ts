@@ -123,7 +123,7 @@ export default class Inquirer {
               chalk.green(" ===") +
               chalk.gray("\n! Please use a service user for this.") +
               chalk.green("\n\n? ") +
-              "DLAP Username:",
+              "LDAP Username:",
             suffix: chalk.green("\n>"),
             type: "input",
             when: (answers) =>
@@ -133,7 +133,7 @@ export default class Inquirer {
           {
             name: "LDAP_SERVICE_USER_PASSWORD",
             prefix: chalk.green("\n?"),
-            message: "DLAP Password:",
+            message: "LDAP Password:",
             suffix: chalk.green("\n>"),
             type: "input",
             when: (answers) =>
