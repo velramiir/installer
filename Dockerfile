@@ -5,6 +5,7 @@ RUN npm install && \
     npm run build && \
     mkdir ./builder && \
     mv ./build ./builder/build && \
+    mv ./config ./builder/config && \
     mv ./tsconfig.json ./builder/tsconfig.json && \
     mv ./package.json ./builder/package.json
 
