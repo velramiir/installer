@@ -56,7 +56,6 @@ class Installer {
       Installer.fillConfigTemplate("dotbase-realm.json", config);
       await Installer.createDockerSecret("dotbase-realm.json", "deployment/dotbase-realm.json");
 
-      
       await Installer.createDockerConfig("traefik.toml", "config/traefik.toml");
       await Installer.createDockerSecret("cert.pem", config.TLS_CERT_PATH);
       await Installer.createDockerSecret("key.pem", config.TLS_KEY_PATH);
@@ -77,7 +76,7 @@ class Installer {
       return;
     }
 
-    config.AUTH_CLIENT_SECRET = Installer.generatePassword();
+    config.AUTH_CLIENT_SECRET = Installer.generateOidcClientSecret();
     config.SIGNING_SECRET = Installer.generatePassword();
 
     config.KEYCLOAK_USER = Installer.generateUsername();
@@ -132,9 +131,17 @@ class Installer {
     });
   }
 
+  private static generateOidcClientSecret(): string {
+    return pwgenerate.generate({
+      length: 32,
+      strict: true,
+      numbers: true,
+    });
+  }
+
   private static async launchDotBase() {
     await Installer.exec(
-      `export DOCKER_CLI_EXPERIMENTAL=enabled && docker app run --parameters-file deployment/parameters.yml --name dot-base ghcr.io/dot-base/dot-base:latest`
+      `docker app run --parameters-file deployment/parameters.yml --name dot-base ghcr.io/dot-base/dot-base:latest`
     );
   }
 
